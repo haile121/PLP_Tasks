@@ -1,0 +1,76 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_iris
+
+# Load and explore the dataset
+try:
+    iris_data = load_iris(as_frame=True)
+    df = iris_data.frame
+    df['species'] = df['target'].apply(lambda x: iris_data.target_names[x])
+    print("Dataset loaded successfully.")
+except Exception as e:
+    print(f"Error loading dataset: {e}")
+
+# Display first few rows
+print(df.head())
+
+# Check dataset info and missing values
+print(df.info())
+print(df.isnull().sum())
+
+# Clean dataset by dropping missing values
+df = df.dropna()
+
+# Basic data analysis
+print(df.describe())
+
+# Group by species and compute mean
+grouped = df.groupby('species').mean()
+print(grouped)
+
+# Observations
+print("Setosa has smaller measurements, Virginica has larger ones.")
+
+# Data visualization setup
+sns.set(style="whitegrid")
+
+# Line chart
+plt.figure(figsize=(8, 5))
+plt.plot(df['sepal length (cm)'][:30], marker='o', linestyle='-', color='orange')
+plt.title('Sepal Length Trend (First 30 Samples)')
+plt.xlabel('Sample Index')
+plt.ylabel('Sepal Length (cm)')
+plt.grid(True)
+plt.show()
+
+# Bar chart
+plt.figure(figsize=(7, 5))
+sns.barplot(x=grouped.index, y=grouped['petal length (cm)'], palette='viridis')
+plt.title('Average Petal Length per Species')
+plt.xlabel('Species')
+plt.ylabel('Petal Length (cm)')
+plt.show()
+
+# Histogram
+plt.figure(figsize=(7, 5))
+plt.hist(df['sepal width (cm)'], bins=15, color='teal', edgecolor='black')
+plt.title('Distribution of Sepal Width')
+plt.xlabel('Sepal Width (cm)')
+plt.ylabel('Frequency')
+plt.show()
+
+# Scatter plot
+plt.figure(figsize=(7, 5))
+sns.scatterplot(data=df, x='sepal length (cm)', y='petal length (cm)', hue='species', palette='deep')
+plt.title('Sepal Length vs. Petal Length by Species')
+plt.xlabel('Sepal Length (cm)')
+plt.ylabel('Petal Length (cm)')
+plt.legend(title='Species')
+plt.show()
+
+# Findings
+print("The dataset is clean with no missing values.")
+print("Virginica species generally has larger petals and sepals.")
+print("There is a positive correlation between petal length and sepal length.")
+print("Species are clearly separable based on petal features.")
