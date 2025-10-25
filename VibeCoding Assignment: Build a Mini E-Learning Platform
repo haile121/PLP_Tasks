@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini E-Learning Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        .course-list, .course-details {
+            display: none;
+        }
+        .course-list.active, .course-details.active {
+            display: block;
+        }
+        .course-item {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .course-item:hover {
+            transform: scale(1.02);
+            background-color: #e8f5e9;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .completed {
+            background-color: #9E9E9E !important;
+            cursor: default;
+        }
+        .back-btn {
+            background-color: #2196F3;
+        }
+        .back-btn:hover {
+            background-color: #1976D2;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Mini E-Learning Platform</h1>
+</header>
+
+<div class="container">
+
+    <!-- Course List Page -->
+    <div class="course-list active" id="courseList">
+        <h2>Available Courses</h2>
+        <div id="coursesContainer"></div>
+    </div>
+
+    <!-- Course Details Page -->
+    <div class="course-details" id="courseDetails">
+        <button class="back-btn" id="backBtn">← Back to Courses</button>
+        <h2 id="courseTitle"></h2>
+        <ul id="lessonsList"></ul>
+        <button id="completeBtn">Mark as Completed</button>
+    </div>
+
+</div>
+
+<script>
+    // Sample course data
+    const courses = [
+        {
+            id: 1,
+            title: "HTML Basics",
+            lessons: ["Introduction to HTML", "HTML Tags", "Forms & Inputs"],
+            completed: false
+        },
+        {
+            id: 2,
+            title: "CSS Fundamentals",
+            lessons: ["Selectors & Properties", "Box Model", "Flexbox & Grid"],
+            completed: false
+        },
+        {
+            id: 3,
+            title: "JavaScript Essentials",
+            lessons: ["Variables & Data Types", "Functions & Loops", "DOM Manipulation"],
+            completed: false
+        }
+    ];
+
+    const coursesContainer = document.getElementById("coursesContainer");
+    const courseListDiv = document.getElementById("courseList");
+    const courseDetailsDiv = document.getElementById("courseDetails");
+    const courseTitle = document.getElementById("courseTitle");
+    const lessonsList = document.getElementById("lessonsList");
+    const completeBtn = document.getElementById("completeBtn");
+    const backBtn = document.getElementById("backBtn");
+
+    let currentCourse = null;
+
+    // Function to render course list
+    function renderCourseList() {
+        coursesContainer.innerHTML = "";
+        courses.forEach(course => {
+            const div = document.createElement("div");
+            div.className = "course-item" + (course.completed ? " completed" : "");
+            div.innerText = course.title + (course.completed ? " ✅ Completed" : "");
+            div.onclick = () => showCourseDetails(course.id);
+            coursesContainer.appendChild(div);
+        });
+    }
+
+    // Function to show course details
+    function showCourseDetails(courseId) {
+        currentCourse = courses.find(c => c.id === courseId);
+        courseTitle.innerText = currentCourse.title;
+        lessonsList.innerHTML = "";
+        currentCourse.lessons.forEach(lesson => {
+            const li = document.createElement("li");
+            li.innerText = lesson;
+            lessonsList.appendChild(li);
+        });
+        completeBtn.style.display = currentCourse.completed ? "none" : "inline-block";
+        courseListDiv.classList.remove("active");
+        courseDetailsDiv.classList.add("active");
+    }
+
+    // Function to mark course as completed
+    completeBtn.onclick = () => {
+        if(currentCourse) {
+            currentCourse.completed = true;
+            renderCourseList();
+            completeBtn.style.display = "none";
+            alert(`${currentCourse.title} marked as completed!`);
+        }
+    }
+
+    // Back button functionality
+    backBtn.onclick = () => {
+        courseDetailsDiv.classList.remove("active");
+        courseListDiv.classList.add("active");
+    }
+
+    // Initial render
+    renderCourseList();
+</script>
+
+</body>
+</html>
