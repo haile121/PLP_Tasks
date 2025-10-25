@@ -1,0 +1,89 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import streamlit as st
+
+# Load the dataset
+try:
+    df = pd.read_csv("metadata.csv")
+    st.write("Data loaded successfully")
+except FileNotFoundError:
+    st.error("metadata.csv not found.")
+
+# Show first few rows
+st.write(df.head())
+
+# Check dataset shape
+st.write("Rows and Columns:", df.shape)
+
+# Show info and missing values
+st.write(df.info())
+st.write(df.isnull().sum())
+
+# Show basic statistics
+st.write(df.describe())
+
+# Drop rows with missing title or abstract
+df_clean = df.dropna(subset=["title", "abstract"])
+
+# Convert publish_time to datetime and extract year
+df_clean["publish_time"] = pd.to_datetime(df_clean["publish_time"], errors="coerce")
+df_clean["year"] = df_clean["publish_time"].dt.year
+
+# Add abstract word count
+df_clean["abstract_word_count"] = df_clean["abstract"].apply(lambda x: len(str(x).split()))
+
+# Count publications by year
+year_counts = df_clean["year"].value_counts().sort_index()
+fig1, ax1 = plt.subplots()
+ax1.bar(year_counts.index, year_counts.values, color="skyblue")
+ax1.set_title("Publications by Year")
+ax1.set_xlabel("Year")
+ax1.set_ylabel("Number of Papers")
+st.pyplot(fig1)
+
+# Top 10 journals
+top_journals = df_clean["journal"].value_counts().head(10)
+fig2, ax2 = plt.subplots()
+sns.barplot(x=top_journals.values, y=top_journals.index, palette="magma", ax=ax2)
+ax2.set_title("Top 10 Journals")
+ax2.set_xlabel("Number of Papers")
+ax2.set_ylabel("Journal")
+st.pyplot(fig2)
+
+# Histogram of abstract word counts
+fig3, ax3 = plt.subplots()
+sns.histplot(df_clean["abstract_word_count"], bins=30, color="green", ax=ax3)
+ax3.set_title("Distribution of Abstract Word Counts")
+ax3.set_xlabel("Word Count")
+st.pyplot(fig3)
+
+# Scatter plot of abstract length vs year
+fig4, ax4 = plt.subplots()
+sns.scatterplot(data=df_clean, x="year", y="abstract_word_count", alpha=0.5, ax=ax4)
+ax4.set_title("Abstract Length vs. Year")
+st.pyplot(fig4)
+
+# Streamlit app title
+st.title("CORD-19 Data Explorer")
+
+# App description
+st.write("Explore COVID-19 research paper metadata")
+
+# Slider to filter by year range
+year_min = int(df_clean["year"].min())
+year_max = int(df_clean["year"].max())
+selected_years = st.slider("Select year range", year_min, year_max, (year_min, year_max))
+
+# Filter dataframe by selected years
+filtered_df = df_clean[(df_clean["year"] >= selected_years[0]) & (df_clean["year"] <= selected_years[1])]
+st.write(f"Papers from {selected_years[0]} to {selected_years[1]}")
+
+# Show sample of filtered data
+st.dataframe(filtered_df[["title", "authors", "journal", "year"]].head(20))
+
+# Display key findings
+st.write("Findings:")
+st.write("- Most papers were published between 2020 and 2021.")
+st.write("- Certain journals are leading in COVID-19 research publications.")
+st.write("- Abstract lengths vary significantly, indicating diverse paper content.")
