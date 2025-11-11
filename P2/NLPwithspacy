@@ -1,0 +1,27 @@
+import spacy
+
+# load English model
+nlp = spacy.load("en_core_web_sm")
+
+# sample text
+reviews = [
+    "I love the Apple iPhone, the camera is amazing!",
+    "Samsung TV has great picture quality but poor sound.",
+    "The Nike shoes are very comfortable."
+]
+
+# process and extract entities
+for review in reviews:
+    doc = nlp(review)
+    print("Review:", review)
+    print("Entities:", [(ent.text, ent.label_) for ent in doc.ents])
+    
+    # simple sentiment analysis
+    if "love" in review or "great" in review or "amazing" in review or "comfortable" in review:
+        sentiment = "Positive"
+    elif "poor" in review or "bad" in review:
+        sentiment = "Negative"
+    else:
+        sentiment = "Neutral"
+    print("Sentiment:", sentiment)
+    print("---")
