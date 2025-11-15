@@ -1,0 +1,110 @@
+# AI Ethics Assignment
+
+## Part 1: Theoretical Understanding
+
+### Q1: Algorithmic Bias
+
+**Definition:** Algorithmic bias occurs when an AI system produces systematically unfair outcomes against certain groups due to biased data or model design.
+
+**Examples:**
+
+1. A hiring algorithm that favors male candidates over female candidates due to historical male-dominated data.
+2. Facial recognition systems misidentifying darker-skinned individuals at higher rates.
+
+### Q2: Transparency vs Explainability
+
+* **Transparency:** Refers to how openly AI systems’ operations and decisions can be observed.
+* **Explainability:** Refers to how well the AI’s decision-making process can be interpreted and understood by humans.
+  **Importance:** Both ensure trust, accountability, and compliance with regulations.
+
+### Q3: GDPR Impact
+
+* Requires explicit consent for data collection and processing.
+* Enforces data minimization and right to explanation for automated decisions.
+* AI systems in the EU must comply with privacy and fairness rules.
+
+### Ethical Principles Matching
+
+* **Justice:** Fair distribution of AI benefits and risks.
+* **Non-maleficence:** Ensuring AI does not harm individuals or society.
+* **Autonomy:** Respecting users’ right to control their data and decisions.
+* **Sustainability:** Designing AI to be environmentally friendly.
+
+---
+
+## Part 2: Case Study Analysis
+
+### Case 1: Biased Hiring Tool
+
+* **Source of Bias:** Training data reflecting historical gender imbalance.
+* **Three Fixes:**
+
+  1. Use balanced dataset with equal gender representation.
+  2. Apply fairness-aware algorithms during model training.
+  3. Regularly audit predictions and adjust model weights.
+* **Fairness Metrics:** Disparate impact ratio, Equal opportunity difference, False positive/negative rates.
+
+### Case 2: Facial Recognition in Policing
+
+* **Ethical Risks:**
+
+  1. Wrongful arrests due to misidentification.
+  2. Privacy violations and surveillance misuse.
+* **Policies:**
+
+  1. Limit usage to authorized cases.
+  2. Include human-in-the-loop verification.
+  3. Regular bias audits and transparency reports.
+
+---
+
+## Part 3: Practical Audit
+
+```python
+# Python code using AI Fairness 360 to analyze COMPAS dataset
+import pandas as pd
+from aif360.datasets import CompasDataset
+from aif360.metrics import BinaryLabelDatasetMetric, ClassificationMetric
+
+# Load COMPAS dataset
+dataset = CompasDataset()
+
+# Inspect dataset metrics
+metric = BinaryLabelDatasetMetric(dataset, privileged_groups=[{'race': 1}], unprivileged_groups=[{'race': 0}])
+print('Disparate impact:', metric.disparate_impact())
+
+# Example: Train a simple classifier
+from sklearn.ensemble import RandomForestClassifier
+from aif360.algorithms.preprocessing import Reweighing
+
+# Reweighing to mitigate bias
+RW = Reweighing(unprivileged_groups=[{'race':0}], privileged_groups=[{'race':1}])
+dataset_transf = RW.fit_transform(dataset)
+
+# Train classifier
+X = dataset_transf.features
+y = dataset_transf.labels.ravel()
+clf = RandomForestClassifier()
+clf.fit(X, y)
+
+# Evaluate
+preds = clf.predict(X)
+print('Model trained and evaluated with bias mitigation')
+```
+
+**Report Summary (300 words placeholder):** Analyze racial bias metrics, visualize false positive disparities, discuss remediation using reweighing, and propose ongoing fairness monitoring.
+
+---
+
+## Part 4: Ethical Reflection
+
+* Ensure AI projects respect privacy, include bias checks, maintain transparency, and allow user consent.
+* Example: For a student performance predictor, anonymize data, apply fairness metrics, and document all decision rules.
+
+---
+
+## Bonus Task: Ethical AI Policy Proposal in Healthcare (1-page)
+
+1. **Patient Consent Protocols:** Explicit opt-in with clear purpose.
+2. **Bias Mitigation Strategies:** Balanced datasets, fairness-aware algorithms.
+3. **Transparency Requirements:** Explainable AI for medical staff and patients, audit logs, and public reporting.
